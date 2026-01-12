@@ -609,8 +609,7 @@ def augment_localization(localization):
     """
     aug_localization = localization.copy()
 
-    # For binary localization features, occasionally flip less-important locations
-    # This assumes localization is one-hot encoded or represents probabilities
+ 
     if np.all(np.logical_or(aug_localization == 0, aug_localization == 1)):
         # For binary features, randomly flip with small probability
         # Identify low-confidence or secondary locations to potentially modify
@@ -703,61 +702,7 @@ def load_and_preprocess_data(use_augmentation=True, augmentation_factor=2):
     return [X_train_emb_balanced, X_train_matrix_balanced,
             X_train_loc_balanced], y_train_balanced, X_test, y_test, protein_loc.shape
 
-# def load_and_preprocess_data():
-#     # Load data
-#     data_dir = 'data'
-#     protein_emb = np.load(os.path.join(data_dir, 'protein_emb.npy'))
-#     protein_matrix = np.load(os.path.join(data_dir, 'protein_matrix.npy'))
-#     protein_loc = np.load(os.path.join(data_dir, 'protein_loc.npy'))
-#     protein_label = np.load(os.path.join(data_dir, 'protein_label.npy'))
-#
-#     protein_label = protein_label.flatten().astype(np.int32)
-#
-#     print(f"\nData shapes before processing:")
-#     print(f"Protein embeddings: {protein_emb.shape}")
-#     print(f"Protein matrix: {protein_matrix.shape}")
-#     print(f"Protein localization: {protein_loc.shape}")
-#     print(f"Protein labels: {protein_label.shape}")
-#     print(f"Initial class distribution: {np.bincount(protein_label)}")
-#
-#     indices = np.arange(len(protein_label))
-#     X_train_idx, X_test_idx = train_test_split(indices, test_size=0.2, random_state=42)
-#
-#     X_train_emb = protein_emb[X_train_idx]
-#     X_train_matrix = protein_matrix[X_train_idx]
-#     X_train_loc = protein_loc[X_train_idx]
-#     y_train = protein_label[X_train_idx]
-#
-#     print("\nApplying SMOTE for class balance...")
-#     X_train_matrix_flat = X_train_matrix.reshape(X_train_matrix.shape[0], -1)
-#
-#     X_train_combined = np.hstack([
-#         X_train_emb,
-#         X_train_matrix_flat,
-#         X_train_loc
-#     ])
-#
-#     smote = SMOTE(random_state=42)
-#     X_train_combined_balanced, y_train_balanced = smote.fit_resample(X_train_combined, y_train)
-#
-#     emb_size = X_train_emb.shape[1]
-#     matrix_size = X_train_matrix.shape[1] * X_train_matrix.shape[2]
-#
-#     X_train_emb_balanced = X_train_combined_balanced[:, :emb_size]
-#     X_train_matrix_balanced = X_train_combined_balanced[:, emb_size:emb_size + matrix_size].reshape(-1,
-#                                                                                                    X_train_matrix.shape[1],
-#                                                                                                    X_train_matrix.shape[2])
-#     X_train_loc_balanced = X_train_combined_balanced[:, emb_size + matrix_size:]
-#
-#     X_test = [
-#         protein_emb[X_test_idx],
-#         protein_matrix[X_test_idx],
-#         protein_loc[X_test_idx]
-#     ]
-#     y_test = protein_label[X_test_idx]
-#
-#     return [X_train_emb_balanced, X_train_matrix_balanced,
-#             X_train_loc_balanced], y_train_balanced, X_test, y_test, protein_loc.shape
+
 
 
 def evaluate_model(model, X_test, y_test, device):
@@ -797,58 +742,7 @@ def evaluate_model(model, X_test, y_test, device):
     print(f"\nEvaluation time: {eval_time:.2f} seconds")
 
 
-# def main():
-#     start_time = time.time()
-#
-#     print("Starting protein classification pipeline...")
-#     print(f"Start time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-#
-#     # Set random seeds for reproducibility
-#     random.seed(42)
-#     np.random.seed(42)
-#     torch.manual_seed(42)
-#     if torch.cuda.is_available():
-#         torch.cuda.manual_seed_all(42)
-#
-#     # Load and preprocess data
-#     X_train, y_train, X_test, y_test, loc_shape = load_and_preprocess_data()
-#
-#     # Define input shapes
-#     input_shapes = {
-#         'emb': (64,),
-#         'matrix': (3, 12),
-#         'loc': (11,)
-#     }
-#
-#     # Load previous best parameters if they exist
-#     model_path = 'protein_model.pt'
-#     best_params_path = model_path.replace('.pt', '_best_params.npy')
-#     previous_best_solution = None
-#     if os.path.exists(best_params_path):
-#         try:
-#             previous_best_solution = np.load(best_params_path, allow_pickle=True).item()
-#             print("Loaded previous best parameters:", previous_best_solution)
-#         except:
-#             print("Could not load previous best parameters")
-#
-#     # Initialize and train HHO classifier with continuation
-#     hho_classifier = HHOProteinClassifier(
-#         input_shapes,
-#         num_hawks=30,
-#         num_iterations=10,  # Adjust number of additional iterations as needed
-#         model_path=model_path,
-#         continue_training=True,
-#         previous_best_solution=previous_best_solution
-#     )
-#
-#     model = hho_classifier.train(X_train, y_train, X_test, y_test)
-#
-#     # Evaluate model
-#     evaluate_model(model, X_test, y_test, hho_classifier.device)
-#
-#     total_time = time.time() - start_time
-#     print(f"\nTotal pipeline execution time: {total_time:.2f} seconds")
-#     print(f"End time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+
 
 
 def main():
