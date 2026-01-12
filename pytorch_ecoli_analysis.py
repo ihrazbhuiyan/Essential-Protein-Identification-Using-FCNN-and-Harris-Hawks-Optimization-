@@ -841,9 +841,9 @@ def main():
         augmentation_factor=2
     )
 
-    # Define input shapes based on your preprocessed data
+    # Define input shapes based on preprocessed data
     input_shapes = {
-        'emb': (X_train[0].shape[1],),  # Dynamic based on your data
+        'emb': (X_train[0].shape[1],),  # Dynamic based on data
         'matrix': (X_train[1].shape[1], X_train[1].shape[2]),  # Dynamic
         'loc': (X_train[2].shape[1],)  # Dynamic
     }
